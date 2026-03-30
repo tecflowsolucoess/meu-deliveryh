@@ -1,8 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-
-const DB_PATH = path.join(process.cwd(), 'data.json');
-
 export interface Ingrediente {
   id: string;
   nome: string;
@@ -48,39 +43,11 @@ export interface CustoOperacional {
   dias: number;
 }
 
-export interface Database {
+export interface Db {
   produtos: Produto[];
   ingredientes: Ingrediente[];
   estoque: Estoque[];
   vendas: Venda[];
   custos: CustoOperacional[];
-}
-
-const initialData: Database = {
-  produtos: [],
-  ingredientes: [],
-  estoque: [],
-  vendas: [],
-  custos: [],
-};
-
-export function getDb(): Database {
-  if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify(initialData, null, 2));
-    return initialData;
-  }
-  const data = fs.readFileSync(DB_PATH, 'utf-8');
-  const parsed = JSON.parse(data);
-  
-  return {
-    produtos: parsed.produtos || [],
-    ingredientes: parsed.ingredientes || [],
-    estoque: parsed.estoque || [],
-    vendas: parsed.vendas || [],
-    custos: parsed.custos || [],
-  };
-}
-
-export function saveDb(data: Database) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+  supabaseStatus?: 'connected' | 'error' | 'not_configured';
 }
