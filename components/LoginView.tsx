@@ -1,98 +1,49 @@
-'use client';
-
+// Substitua o conteúdo de LoginView.tsx por este
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { Lock, User, ArrowRight, ChefHat } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
-interface LoginViewProps {
-  onLogin: (user: string) => void;
-}
-
-export function LoginView({ onLogin }: LoginViewProps) {
-  const [username, setUsername] = useState('');
+export default function LoginView() {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'admin') {
-      onLogin(username);
+    setLoading(true);
+    
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) alert(error.message);
+      else alert('Verifique seu e-mail para confirmar o cadastro!');
     } else {
-      setError('Usuário ou senha incorretos');
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) alert('Erro ao entrar: ' + error.message);
     }
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md space-y-8"
-      >
-        <div className="text-center space-y-4">
-          <div className="w-20 h-20 bg-gray-900 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-2xl shadow-gray-200">
-            <ChefHat size={40} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-black tracking-tight text-gray-900">MeuDelivery</h1>
-            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-1">Gestão Profissional</p>
-          </div>
-        </div>
-
-        <form onSubmit={handleLogin} className="bg-white p-8 rounded-[3rem] shadow-xl shadow-gray-200/50 border border-gray-100 space-y-6">
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Usuário</label>
-              <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-gray-900 transition-colors" size={20} />
-                <input 
-                  type="text" 
-                  value={username}
-                  onChange={e => setUsername(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50 rounded-2xl border-none font-bold text-gray-900 focus:ring-2 focus:ring-gray-900 transition-all"
-                  placeholder="Seu usuário"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Senha</label>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-gray-900 transition-colors" size={20} />
-                <input 
-                  type="password" 
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50 rounded-2xl border-none font-bold text-gray-900 focus:ring-2 focus:ring-gray-900 transition-all"
-                  placeholder="Sua senha"
-                />
-              </div>
-            </div>
-          </div>
-
-          {error && (
-            <motion.p 
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="text-xs font-bold text-red-500 text-center"
-            >
-              {error}
-            </motion.p>
-          )}
-
-          <button 
-            type="submit"
-            className="w-full bg-gray-900 text-white py-5 rounded-2xl font-black flex items-center justify-center gap-3 active:scale-[0.98] transition-all shadow-lg shadow-gray-200"
-          >
-            ENTRAR NO PAINEL
-            <ArrowRight size={20} />
-          </button>
-        </form>
-
-        <p className="text-center text-[10px] font-black text-gray-300 uppercase tracking-widest">
-          Esqueceu sua senha? Entre em contato com o suporte
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <form onSubmit={handleAuth} className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center">{isSignUp ? 'Criar Conta' : 'Entrar no Delivery'}</h2>
+        <input 
+          type="email" placeholder="Seu e-mail" 
+          className="w-full p-2 mb-4 border rounded text-black"
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input 
+          type="password" placeholder="Sua senha" 
+          className="w-full p-2 mb-6 border rounded text-black"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+          {loading ? 'Carregando...' : (isSignUp ? 'Cadastrar' : 'Entrar')}
+        </button>
+        <p className="mt-4 text-center cursor-pointer text-blue-500" onClick={() => setIsSignUp(!isSignUp)}>
+          {isSignUp ? 'Já tem conta? Entre aqui' : 'Não tem conta? Clique aqui para criar'}
         </p>
-      </motion.div>
+      </form>
     </div>
   );
 }
