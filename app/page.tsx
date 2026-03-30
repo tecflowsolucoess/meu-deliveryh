@@ -10,8 +10,8 @@ import { GestaoView } from '@/components/GestaoView';
 import { DashboardView } from '@/components/DashboardView';
 import { CustosView } from '@/components/CustosView';
 import { SimuladorView } from '@/components/SimuladorView';
-import { ConfigView } from '@/components/ConfigView';
-import { LoginView } from '@/components/LoginView';
+import ConfigView from '@/components/ConfigView';
+import LoginView from '@/components/LoginView';
 
 export default function MeuDeliveryApp() {
   const { 
